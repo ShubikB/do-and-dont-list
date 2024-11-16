@@ -19,26 +19,27 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="style.css" />
+    <style></style>
   </head>
 
   <body>
     <div class="wrapper">
-      <div class="container">
+      <div class="container pt-5">
         <!-- header row -->
         <div class="row p-5">
           <div class="col text-center">
-            <h1>NOT TO DO LIST</h1>
+            <h1>Not To Do List <i class="fa-solid fa-hand "></i></h1>
           </div>
         </div>
 
         <!-- add task form row -->
-        <div class="row p-5 border rounded shadow-lg">
+        <div class="add-task-container row p-5 rounded ">
           <div class="col-7">
             <input
               type="text"
               class="form-control"
               id="task"
-              placeholder="ADD YOUR TASK"
+              placeholder="Add your Task"
             />
           </div>
           <div class="col-2">
@@ -52,11 +53,11 @@
           <div class="col-3 d-grid">
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-success"
               id="addTask"
               onclick="addTask()"
             >
-              ADD TASK
+              Add Task
             </button>
           </div>
         </div>
@@ -66,8 +67,8 @@
           <div class="col">
             <div class="row">
               <div class="col text-center">
-                <h1>Entry List</h1>
-                <hr />
+                <h2>Entry List</h2>
+                <hr/>
               </div>
             </div>
 
@@ -80,7 +81,7 @@
           <div class="col">
             <div class="row">
               <div class="col text-center">
-                <h1>Bad List</h1>
+                <h2>Bad List</h2>
                 <hr />
               </div>
             </div>

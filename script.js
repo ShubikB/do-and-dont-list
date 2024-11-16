@@ -17,19 +17,19 @@ const randomIdGenerator = () => {
 let taskList = [
   {
     id: "OQaCmVDVB3",
-    task: "task1",
+    task: "Task 1",
     hour: 10,
     type: "entry",
   },
   {
     id: "29JR1fr3iX",
-    task: "task2",
+    task: "Task 2",
     hour: 20,
     type: "entry",
   },
   {
     id: "d1mQJzpGgE",
-    task: "task3",
+    task: "Tak 3",
     hour: 30,
     type: "entry",
   },
@@ -66,7 +66,7 @@ const addTask = () => {
     alert("Please enter task or hour!!");
   }
 
-  // console.log(taskList);
+
 };
 
 // displaying entry list and bad list
@@ -83,7 +83,7 @@ const displayTask = () => {
     if (item.type == "entry") {
       goodTrValue = `
                   <tr class='task-row'>
-                    <td>${index + 1} <input type='checkbox' /></td>
+                    <td> <input type='checkbox' /></td>
                     <td>${item.task}</td>
                     <td>${item.hour}</td>
                     <td class="text-end "><button class="btn btn-danger me-1" onclick="deleteTask('${
