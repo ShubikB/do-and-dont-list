@@ -1,172 +1,97 @@
-const WEEKLY_ALLOCATION = 24 * 7;
+const WEEKLY_ALLOCATION = 24 * 7
+const RANDOM_STRING_LENGTH = 10
 
-// generate unique string
-const randomIdGenerator = () => {
-  let randomStringLength = 10;
-  let randomString = "";
-  let alphabetString =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  for (let i = 0; i < randomStringLength; i++) {
-    let randomIndex = Math.floor(Math.random() * alphabetString.length);
-    randomString += alphabetString[randomIndex];
-  }
+// Generates ramndom Stinng for unique task ID
+const generateRandomId = () => {
+  const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  return Array.from({ length: RANDOM_STRING_LENGTH }, () =>
+    alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+  ).join("")
+}
 
-  return randomString;
-};
-
+// Initial Task List
 let taskList = [
-  {
-    id: "OQaCmVDVB3",
-    task: "Task 1",
-    hour: 10,
-    type: "entry",
-  },
-  {
-    id: "29JR1fr3iX",
-    task: "Task 2",
-    hour: 20,
-    type: "entry",
-  },
-  {
-    id: "d1mQJzpGgE",
-    task: "Tak 3",
-    hour: 30,
-    type: "entry",
-  },
-];
+  { id: generateRandomId(), task: "Task 1", hour: 10, type: "entry" },
+  { id: generateRandomId(), task: "Task 2", hour: 20, type: "entry" },
+  { id: generateRandomId(), task: "Task 3", hour: 30, type: "entry" },
+]
 
-// INPUT TASK AND HOUR
-// ADD the TASK to task list
 const addTask = () => {
-  // console.log("ADD TASK CALLED");
+  const taskField = document.getElementById("task")
+  const hourField = document.getElementById("hour")
 
-  const taskField = document.getElementById("task");
-  const hourField = document.getElementById("hour");
-
-  if (taskField.value != "" && hourField.value != "") {
-    const taskObject = {
-      id: randomIdGenerator(),
-      task: taskField.value,
-      hour: parseInt(hourField.value),
-      type: "entry",
-    };
-
-    if (taskObject.hour + calculateTotalhour() <= WEEKLY_ALLOCATION) {
-      taskList.push(taskObject);
-      displayTask();
-      const toastLiveExample = document.getElementById("liveToast");
-
-      const toastBootstrap =
-        bootstrap.Toast.getOrCreateInstance(toastLiveExample);
-      toastBootstrap.show();
-    } else {
-      alert("TASK HOUR ALLOCATION EXCEEDED");
-    }
-  } else {
-    alert("Please enter task or hour!!");
+  if (!taskField.value || !hourField.value) {
+    return alert("Please enter task and hour!")
   }
 
+  // Create a new task object
+  const taskObject = {
+    id: generateRandomId(),
+    task: taskField.value,
+    hour: parseInt(hourField.value),
+    type: "entry",
+  }
 
-};
+  if (calculateTotalHours() + taskObject.hour > WEEKLY_ALLOCATION) {
+    return alert("TASK HOUR ALLOCATION EXCEEDED")
+  }
 
-// displaying entry list and bad list
+  taskList.push(taskObject)
+  displayTask()
+  const toast = bootstrap.Toast.getOrCreateInstance(document.getElementById("liveToast"))
+  toast.show()
+}
+
+// Displays the tasks in the "entry" and "bad" lists
 const displayTask = () => {
-  const goodListElement = document.getElementById("entry-list");
-  const badListElement = document.getElementById("bad-list");
+  const goodList = document.getElementById("entry-list")
+  const badList = document.getElementById("bad-list")
+  goodList.innerHTML = ""
+  badList.innerHTML = ""
 
-  goodListElement.innerHTML = "";
-  badListElement.innerHTML = "";
+  // Iterate through the task list and create rows for each task
+  taskList.forEach((task, index) => {
+    const taskRow = `
+      <tr>
+        <td>${task.type === "entry" ? `<input type="checkbox" />` : index + 1}</td>
+        <td>${task.task}</td>
+        <td>${task.hour}</td>
+        <td class="text-end">
+          <button class="btn btn-${task.type === "entry" ? "success" : "warning"}" 
+            onclick="convertTask('${task.id}')">${
+      task.type === "entry" ? "Move" : "Return"
+    }</button>
+          <button class="btn btn-danger ms-1" onclick="deleteTask('${task.id}')">Delete</button>
+        </td>
+      </tr>`
+    if (task.type === "entry") goodList.innerHTML += taskRow
+    else badList.innerHTML += taskRow
+  })
 
-  taskList.map((item, index) => {
-    let goodTrValue = "";
-    let badTrValue = "";
-    if (item.type == "entry") {
-      goodTrValue = `
-                  <tr class='task-row'>
-                    <td> <input type='checkbox' /></td>
-                    <td>${item.task}</td>
-                    <td>${item.hour}</td>
-                    <td class="text-end "><button class="btn btn-danger me-1" onclick="deleteTask('${
-                      item.id
-                    }')">Delete</button>
-                          <button class="btn btn-success" onclick="convertTask('${
-                            item.id
-                          }')">Move</button></td>
-                  </tr>
-      `;
-    } else {
-      badTrValue = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.task}</td>
-                    <td>${item.hour}</td>
-                  <td class="text-end "> <button class="btn btn-warning" onclick="convertTask('${
-                    item.id
-                  }')">Move</button>
-                        <button class="btn btn-danger ms-1" onclick="deleteTask('${
-                          item.id
-                        }')">Delete</button></td>
-                </tr>`;
-    }
+  document.getElementById("totalHours").innerText = calculateTotalHours()
+  document.getElementById("badHour").innerText = calculateBadHours()
+}
 
-    goodListElement.innerHTML = goodListElement.innerHTML + goodTrValue;
-    badListElement.innerHTML = badListElement.innerHTML + badTrValue;
-  });
-
-  // display total hour
-  const totalHourSpan = document.getElementById("totalHours");
-  totalHourSpan.innerText = calculateTotalhour();
-
-  // display bad hour
-  const badHourSpan = document.getElementById("badHour");
-  badHourSpan.innerText = calculateBadHours();
-};
-
-// change type from entry -> bad or bad -> entry
+// Converts a task's type between "entry" and "bad"
 const convertTask = (id) => {
-  console.log("TASK CONVERTED");
+  const task = taskList.find((task) => task.id === id)
+  task.type = task.type === "entry" ? "bad" : "entry"
+  displayTask()
+}
 
-  let task = taskList.find((task) => task.id == id);
-
-  task.type = task.type == "entry" ? "bad" : "entry";
-
-  displayTask();
-};
-
-// Delete Task
+// deletes Task
 const deleteTask = (id) => {
-  console.log("ID TO DELETE:", id);
-
-  if (confirm("Deleting Task....\n Are you Sure ?")) {
-    taskList = taskList.filter((task) => task.id !== id);
-
-    displayTask();
+  if (confirm("Are you sure you want to delete this task?")) {
+    taskList = taskList.filter((task) => task.id !== id)
+    displayTask()
   }
-};
+}
 
-const calculateTotalhour = () => {
-  let totalHour = taskList.reduce((acc, item) => acc + item.hour, 0);
+// Calculates the total hours of all tasks
+const calculateTotalHours = () => taskList.reduce((acc, task) => acc + task.hour, 0)
 
-  return totalHour;
-};
+// Calculates the total hours of tasks marked as "bad"
+const calculateBadHours = () =>
+  taskList.reduce((acc, task) => (task.type === "bad" ? acc + task.hour : acc), 0)
 
-const calculateBadHours = () => {
-  // let badHour = taskList.reduce((acc, item) => {
-  //   return acc + (item.type == "bad" ? item.hour : 0);
-  // }, 0);
-
-  let badHour = taskList.reduce((acc, task) => {
-    if (task.type == "bad") {
-      return acc + task.hour;
-      0;
-    } else {
-      return acc;
-    }
-  }, 0);
-
-  return badHour;
-};
-
-displayTask();
-
-displayTask();
+displayTask()
